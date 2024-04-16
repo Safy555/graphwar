@@ -9,13 +9,13 @@
         <Filename Value="graphwar.pas"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="9"/>
-        <CursorPos X="27" Y="37"/>
-        <UsageCount Value="24"/>
+        <CursorPos X="19" Y="49"/>
+        <FoldState Value=" T3B0G."/>
+        <UsageCount Value="25"/>
         <Loaded Value="True"/>
       </Unit0>
     </Units>
-    <JumpHistory Count="23" HistoryIndex="22">
+    <JumpHistory Count="27" HistoryIndex="26">
       <Position1>
         <Filename Value="graphwar.pas"/>
         <Caret Line="43" Column="8" TopLine="19"/>
@@ -108,6 +108,22 @@
         <Filename Value="graphwar.pas"/>
         <Caret Line="49" Column="27" TopLine="25"/>
       </Position23>
+      <Position24>
+        <Filename Value="graphwar.pas"/>
+        <Caret Line="37" Column="34" TopLine="12"/>
+      </Position24>
+      <Position25>
+        <Filename Value="graphwar.pas"/>
+        <Caret Line="12" Column="45" TopLine="2"/>
+      </Position25>
+      <Position26>
+        <Filename Value="graphwar.pas"/>
+        <Caret Line="37" Column="33" TopLine="17"/>
+      </Position26>
+      <Position27>
+        <Filename Value="graphwar.pas"/>
+        <Caret Line="25" Column="30" TopLine="8"/>
+      </Position27>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>
