@@ -76,29 +76,72 @@ end;
 
 function fx(input1:string; c:integer):integer;
 var
-  i,poc:integer;
+  i,j,poc,poc1,kod,cislo,posz:integer;
   x,res:real;
-  s1,s2:string;
+  s1,s2,znamienko:string;
 begin
   x:=c/k;
-  if pos('x',lowercase(input1))=0 then fx:=hraci[1].y  //konstanty napr. y=2
+  if pos('x',lowercase(input1))<1 then fx:=hraci[1].y  //konstanty napr. y=2
   else begin
-    poc:=0;
+       res:=0;
+       poc:=0;
+       for i:=1 to length(input1) do begin
+          if (input1[i]='+') or (input1[i]='-') or (input1[i]='*') or (input1[i]='/') then poc:=poc+1;
+       end;
+       for i:=1 to poc do begin
+          posz:=0;
+          poc1:=0;
+          znamienko:=input1[1]; delete(input1,1,1);
+          if i<>poc then begin
+               repeat
+                  poc1:=poc1+1;
+                  if (input1[poc1]='+') or (input1[poc1]='-') or (input1[poc1]='*') or (input1[poc1]='/') then posz:=poc1;
+               until posz<>0;
+               s1:=copy(input1,1,posz-1); delete(input1,1,posz-1);
+          end
+          else  s1:=input1;
+          if znamienko='+' then begin
+               if s1<>'x' then begin
+                 val(s1,cislo,kod);
+                 res:=res+cislo;
+               end
+               else res:=res+x;
+          end
+          else if znamienko='-' then begin
+               if s1<>'x' then begin
+                 val(s1,cislo,kod);
+                 res:=res-cislo;
+               end
+               else res:=res-x;
+          end
+          else if znamienko='*' then begin
+               if s1<>'x' then begin
+                 val(s1,cislo,kod);
+                 res:=res*cislo;
+               end
+               else res:=res*x;
+          end
+          else if znamienko='/' then begin
+               if s1<>'x' then begin
+                 val(s1,cislo,kod);
+                 res:=res/cislo;
+               end
+               else res:=res/x;
+          end;
+
+       end;
+
+    {poc:=0;
     for i:=1 to length(input1) do begin
         if (input1[i]='+') or (input1[i]='-') or (input1[i]='*') or (input1[i]='/') then poc:=poc+1;
     end;
-
     if poc=0 then res:=-x*k    //y=x
     else begin
          for i:=1 to poc do begin
              //s1:=copy(input1,1,);
-
-
-
-
          end;
-    end;
-    fx:=round(res+((getmaxy-100) div 2));
+    end;}
+       fx:=round(-res*k+((getmaxy-100) div 2));
   end;
 end;
 
@@ -107,7 +150,7 @@ var
   j:integer;
 begin
    for j:=-((getmaxx-200) div 2) to ((getmaxx-200) div 2) do begin
-       if (fx(input,j)+((getmaxy-100) div 2)<getmaxy-200) and (fx(input,j)+((getmaxy-100) div 2)>100) then putpixel(j+(getmaxx div 2),fx(input,j),5);
+       if (fx(input,j)<getmaxy-200) and (fx(input,j)>100) then putpixel(j+(getmaxx div 2),fx(input,j),5);
    end;
 end;
 
@@ -225,6 +268,7 @@ end;
 
 procedure predpis();
 begin
+  input:='';
   moveto(250,getmaxy-110);
   SetTextStyle (0,0,2);setcolor(green);
   repeat
@@ -240,9 +284,18 @@ begin
           bar(250,getmaxy-110,getmaxx-200,getmaxy-90);
           moveto(250,getmaxy-110);
         end;
+        if (ch=#13) and ((input[1]='*') or (input[1]='/') or (input[1]='.') or (input[1]=',')) then begin
+          input:='';
+          setfillstyle(1,black);
+          bar(250,getmaxy-110,getmaxx-200,getmaxy-90);
+          moveto(250,getmaxy-110);
+        end;
       end;
   until (ch=#13) and (length(input)>0);
+  if (input[1]<>'+') and (input[1]<>'-') then insert('+',input,1);
   SetTextStyle (0,0,1);setcolor(white);
+  moveto(100,20);
+  outtext(input);
 end;
 
 procedure hra();
@@ -256,7 +309,6 @@ begin
   pole();
   predpis();
   vykreslenie();
-
 
 
   readln();
