@@ -1,6 +1,6 @@
 program graphwar;
 uses graph,wincrt;
-const k=20;  //kolko pixelov je jeden dielik
+const k=50;  //kolko pixelov je jeden dielik
       hracr=20; //polomer kruhu hraca
 type Thrac=record
   x,y:integer;
@@ -8,7 +8,7 @@ type Thrac=record
 var
   gd,gm:smallint;
   i,j,stavhry:integer;
-  input:string;
+  input,la:string;
   ch:char;
   hraci: array [1..2] of Thrac;
 procedure panacik(panacikx,panaciky:integer;strana:string);
@@ -130,27 +130,19 @@ begin
           end;
 
        end;
-
-    {poc:=0;
-    for i:=1 to length(input1) do begin
-        if (input1[i]='+') or (input1[i]='-') or (input1[i]='*') or (input1[i]='/') then poc:=poc+1;
-    end;
-    if poc=0 then res:=-x*k    //y=x
-    else begin
-         for i:=1 to poc do begin
-             //s1:=copy(input1,1,);
-         end;
-    end;}
        fx:=round(-res*k+((getmaxy-100) div 2));
   end;
 end;
 
-procedure vykreslenie();
+procedure vykreslenie(hracx,hracy:integer);
 var
-  j:integer;
+  j,p:integer;
 begin
-   for j:=-((getmaxx-200) div 2) to ((getmaxx-200) div 2) do begin
-       if (fx(input,j)<getmaxy-200) and (fx(input,j)>100) then putpixel(j+(getmaxx div 2),fx(input,j),5);
+   p:=hraci[1].y-fx(input,hracx-100-((getmaxx-200) div 2));
+   for j:=hracx-100-((getmaxx-200) div 2) to ((getmaxx-200) div 2) do begin
+       if (fx(input,j)-p<getmaxy-200) and (fx(input,j)-p>100) then begin
+            putpixel(j+(getmaxx div 2),fx(input,j)+p,5);
+       end;
    end;
 end;
 
@@ -308,7 +300,9 @@ begin
   initgraph(gd,gm,'C:\lazarus');
   pole();
   predpis();
-  vykreslenie();
+  vykreslenie(hraci[1].x,hraci[1].y);
+  str(hraci[1].x,la);
+  outtextxy(100,50,la);
 
 
   readln();
