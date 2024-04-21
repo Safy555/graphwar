@@ -9,14 +9,14 @@
         <Filename Value="graphwar.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="383"/>
-        <CursorPos X="64" Y="405"/>
+        <TopLine Value="382"/>
+        <CursorPos X="62" Y="405"/>
         <FoldState Value=" T3W0G2 pjFjb0Q01111 PYmJ0w"/>
         <UsageCount Value="23"/>
         <Loaded Value="True"/>
       </Unit>
     </Units>
-    <JumpHistory HistoryIndex="4">
+    <JumpHistory HistoryIndex="3">
       <Position>
         <Filename Value="graphwar.lpr"/>
         <Caret Line="309" Column="32" TopLine="11"/>
@@ -32,10 +32,6 @@
       <Position>
         <Filename Value="graphwar.lpr"/>
         <Caret Line="319" Column="27" TopLine="275"/>
-      </Position>
-      <Position>
-        <Filename Value="graphwar.lpr"/>
-        <Caret Line="405" Column="62" TopLine="382"/>
       </Position>
     </JumpHistory>
     <RunParams>
