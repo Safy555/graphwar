@@ -2,15 +2,23 @@ program graphwar;
 uses graph,wincrt;
 const k=50;  //kolko pixelov je jeden dielik
       hracr=20; //polomer kruhu hraca
+      suborc='subor.txt';
 type Thrac=record
   x,y:integer;
+  end;
+  Tscore=record
+    scorehraca:integer;
+    menohraca:string[20];
   end;
 var
   gd,gm:smallint;
   i,j,stavhry,esc:integer;
-  input,input_old:string;
+  input,input_old,meno:string;
   ch:char;
+  hrac:Tscore;
   hraci: array [1..2] of Thrac;
+  player:array [1..60] of Tscore;
+  subor:file of Tscore;
 function StringToReal(s:string):real;
   var
     code:integer;
@@ -22,6 +30,46 @@ function StringToReal(s:string):real;
     else
       StringToReal:= 0.0; // Return 0.0 if conversion fails
   end;
+
+procedure tabulka();
+var i,j:integer;
+begin
+ for i:=1 to 60 do
+  begin
+   for j:=1 to 60-i do
+    begin
+      if player[j].scorehraca < player[j+1].scorehraca  then
+      begin
+       hrac:=player[j];
+       player[j]:=player[j+1];
+       player[j+1]:=hrac;
+      end
+    end;
+  end;
+end;
+
+procedure prepis_do_subor();
+var x:integer;
+begin
+  x:=0;
+  rewrite(subor);
+  repeat
+    x:=x+1;
+    write(subor,player[x]);
+  until x = 60;
+  close(subor);
+end;
+
+procedure prepis_do_pola();
+var i:integer;
+begin
+  reset(subor);
+  for i:=1 to filesize(subor) do begin
+    read(subor,player[i]);
+  end;
+  close(subor);
+end;
+
 procedure box(stred_x,stred_y,sirka,vyska,border:integer; farba_stred,farba_vlavo,farba_vpravo:word);    //box s tienmi
 begin
   setfillstyle(1,farba_stred);
@@ -111,7 +159,7 @@ var
   s1,s2,znamienko:string;
 begin
   x:=c/k;
-  if pos('x',lowercase(input1))<1 then fx:=hraci[1].y  //konstanty napr. y=2
+  if (pos('x',lowercase(input1))<1)  then fx:=hraci[1].y  //konstanty napr. y=2
   else begin
        res:=0;
        poc:=0;
@@ -131,28 +179,28 @@ begin
           end
           else  s1:=input1;
           if znamienko='+' then begin
-               if s1<>'x' then begin
+               if lowercase(s1)<>'x' then begin
                  cislo:=StringToReal(s1);
                  res:=res+cislo;
                end
                else res:=res+x;
           end
           else if znamienko='-' then begin
-               if s1<>'x' then begin
+               if lowercase(s1)<>'x' then begin
                  cislo:=StringToReal(s1);
                  res:=res-cislo;
                end
                else res:=res-x;
           end
           else if znamienko='*' then begin
-               if s1<>'x' then begin
+               if lowercase(s1)<>'x' then begin
                  cislo:=StringToReal(s1);
                  res:=res*cislo;
                end
                else res:=res*x;
           end
           else if znamienko='/' then begin
-               if s1<>'x' then begin
+               if lowercase(s1)<>'x' then begin
                  cislo:=StringToReal(s1);
                  res:=res/cislo;
                end
@@ -317,7 +365,7 @@ begin
   repeat
       if keypressed then begin
         ch:=readkey;
-        if (((ord(ch)>=40)and(ord(ch)<=57))or (ord(ch)=88) or (ord(ch)=120)) and ((ch<>#13)or(ch<>#8)or(ch<>#27)) then begin
+        if (((ord(ch)>=40)and(ord(ch)<=57))or (ord(ch)=88) or (ord(ch)=120) or (ord(ch)=88)) and ((ch<>#13)or(ch<>#8)or(ch<>#27)) then begin
            outtext(ch);
            input:=input+ch;
         end;
@@ -356,7 +404,7 @@ begin
   p:=0;
   sipky_y:=sipky_y+(((getmaxy-250) div nn) div 2);
   setfillstyle(1,darkgray);
-  bar(sipky_x-(sipky_sirka div 2)+7,sipky_y+4,sipky_x+(sipky_sirka div 2)+7,sipky_y+sipky_vyska+4);
+  bar(sipky_x-(sipky_sirka div 2)-3,sipky_y+3,sipky_x+(sipky_sirka div 2)-3,sipky_y+sipky_vyska+3);
   setfillstyle(1,farba_sipky);
   bar(sipky_x-(sipky_sirka div 2),sipky_y,sipky_x+(sipky_sirka div 2),sipky_y+sipky_vyska);
   repeat
@@ -364,21 +412,21 @@ begin
      ch:=readkey;
      if (lowercase(ch)='s') and (x<nn) then begin    //sipka dole
        setfillstyle(1,lightgray);
-       bar(sipky_x-(sipky_sirka div 2)-1,(sipky_y+skok*p)-1,sipky_x+(sipky_sirka div 2)+8,(sipky_y+skok*p)+sipky_vyska+4);
+       bar(sipky_x-(sipky_sirka div 2)-8,(sipky_y+skok*p)-1,sipky_x+(sipky_sirka div 2)+1,(sipky_y+skok*p)+sipky_vyska+4);
        p:=p+1;
        x:=x+1;
        setfillstyle(1,darkgray);
-       bar(sipky_x-(sipky_sirka div 2)+7,(sipky_y+skok*p)+4,sipky_x+(sipky_sirka div 2)+7,(sipky_y+skok*p)+sipky_vyska+4);
+       bar(sipky_x-(sipky_sirka div 2)-3,(sipky_y+skok*p)+3,sipky_x+(sipky_sirka div 2)-3,(sipky_y+skok*p)+sipky_vyska+3);
        setfillstyle(1,farba_sipky);
        bar(sipky_x-(sipky_sirka div 2),(sipky_y+skok*p),sipky_x+(sipky_sirka div 2),(sipky_y+skok*p)+sipky_vyska);
      end
      else if (lowercase(ch)='w') and (x>1) then begin     //sipka hore
        setfillstyle(1,lightgray);
-       bar(sipky_x-(sipky_sirka div 2)-1,(sipky_y+skok*p)-1,sipky_x+(sipky_sirka div 2)+8,(sipky_y+skok*p)+sipky_vyska+4);
+       bar(sipky_x-(sipky_sirka div 2)-8,(sipky_y+skok*p)-1,sipky_x+(sipky_sirka div 2)+1,(sipky_y+skok*p)+sipky_vyska+4);
        p:=p-1;
        x:=x-1;
        setfillstyle(1,darkgray);
-       bar(sipky_x-(sipky_sirka div 2)+7,(sipky_y+skok*p)+4,sipky_x+(sipky_sirka div 2)+7,(sipky_y+skok*p)+sipky_vyska+4);
+       bar(sipky_x-(sipky_sirka div 2)-3,(sipky_y+skok*p)+3,sipky_x+(sipky_sirka div 2)-3,(sipky_y+skok*p)+sipky_vyska+3);
        setfillstyle(1,farba_sipky);
        bar(sipky_x-(sipky_sirka div 2),(sipky_y+skok*p),sipky_x+(sipky_sirka div 2),(sipky_y+skok*p)+sipky_vyska);
      end;
@@ -414,44 +462,144 @@ begin
 
 end;
 
+procedure login(dlzka:integer); //login hraca
+var poc:integer;
+    dlzkas:string;
+begin
+  str(dlzka,dlzkas);
+  box(getmaxx div 2,getmaxy div 2,getmaxx,getmaxy,20,lightgray,white,darkgray);
+
+  //nadpis
+  settextstyle(0,0,10);
+  setcolor(darkgray);
+  outtextxy((getmaxx div 2)-305,55,'Graphwar');
+  setcolor(green);
+  outtextxy((getmaxx div 2)-300,50,'Graphwar');
+  settextstyle(0,0,1);setcolor(white);
+
+  box(getmaxx div 2,getmaxy div 2,getmaxx div 2,getmaxy div 2,20,lightgray,darkgray,white);
+
+  settextstyle(0,0,5);
+  setcolor(darkgray);
+  outtextxy((getmaxx div 2)-203,(getmaxy div 2)-(getmaxy div 4) +28,'Vase meno');
+  setcolor(green);
+  outtextxy((getmaxx div 2)-200,(getmaxy div 2)-(getmaxy div 4) +25,'Vase meno');
+  settextstyle(0,0,1);
+  setcolor(darkgray);
+  outtextxy((getmaxx div 2)-81,(getmaxy div 2)+(getmaxy div 4) -34,'max '+dlzkas+' znakov');
+  setcolor(green);
+  outtextxy((getmaxx div 2)-80,(getmaxy div 2)+(getmaxy div 4) -35,'max '+dlzkas+' znakov');
+
+
+  settextstyle(0,0,3);
+  setcolor(black);
+  moveto((getmaxx div 2)-(getmaxx div 6),getmaxy div 2);
+  poc:=0;
+  meno:='';
+  repeat
+     if keypressed then begin
+       ch:=readkey;
+       if (((ord(ch)>=48)and(ord(ch)<=57)) or ((ord(ch)>=65)and(ord(ch)<=90)) or ((ord(ch)>=97)and(ord(ch)<=122))) and (length(meno)+1<=dlzka) then begin
+         outtext(ch);
+         meno:=meno+ch;
+       end;
+       if ch=#8 then begin
+         setfillstyle(1,lightgray);
+         bar((getmaxx div 2)-(getmaxx div 6)-10,(getmaxy div 2)-10,(getmaxx div 2)+(getmaxx div 6),(getmaxy div 2)+30);
+         meno:='';
+         moveto((getmaxx div 2)-(getmaxx div 6),getmaxy div 2);
+       end;
+     end;
+  until ((ch=#13) and (length(meno)>0)); //kontrola dlzky mena
+  //outtextxy(100,100,meno);
+
+
+
+  reset(subor);
+  for i:=1 to filesize(subor) do begin
+         read(subor,hrac);
+         if hrac.menohraca=meno then begin
+           poc:=1;
+         end;
+      end;
+
+  hrac.menohraca:=meno;
+  if poc=0 then begin
+    seek(subor,filesize(subor));
+    hrac.scorehraca:=0;
+    write(subor,hrac);
+  end;
+  close(subor);
+end;
+
+procedure rebricek();   //rebricek
+var gx,gy:integer;
+    ii,score:string;
+begin
+  reset(subor);
+  box(getmaxx div 2,getmaxy div 2,getmaxx,getmaxy,20,lightgray,white,darkgray);
+
+  //nadpis
+  settextstyle(0,0,10);
+  setcolor(darkgray);
+  outtextxy((getmaxx div 2)-305,55,'Graphwar');
+  setcolor(green);
+  outtextxy((getmaxx div 2)-300,50,'Graphwar');
+  settextstyle(0,0,1);setcolor(white);
+  gy:=0;
+  gx:=0;
+  box(getmaxx div 2,270+((getmaxy-450) div 2),getmaxx-200,getmaxy-210,20,lightgray,darkgray,white);
+  settextstyle(0,0,2);setcolor(black);
+  for i:=1 to filesize(subor) do begin
+     read(subor,hrac);
+     str(i,ii);
+     str(player[i].scorehraca,score);
+     outtextxy(140+(gx*100),200+(gy*20),ii);
+     outtextxy(200+(gx*100),200+(gy*20),player[i].menohraca);
+     outtextxy(600+(gx*100),200+(gy*20),score);
+     gy:=gy+1;
+  end;
+  close(subor);
+end;
 
 procedure hra();     //cela hra
 var
   vy,koniec,t:integer;
 begin
+  prepis_do_pola();
   koniec:=0;
   repeat
     menu(4);
     vy:=((getmaxy-250) div 4);
-    settextstyle(0,0,7);setcolor(darkgray);
-    outtextxy((getmaxx div 2)-103,170+(vy div 2)-25,'Hrat');
-    outtextxy((getmaxx div 2)-213,170+(vy div 2)+vy-25,'Rebricek');
-    outtextxy((getmaxx div 2)-213,170+(vy div 2)+(2*vy)-25,'Napoveda');
-    outtextxy((getmaxx div 2)-158,170+(vy div 2)+(3*vy)-25,'Koniec');
+    settextstyle(0,0,5);setcolor(darkgray);
+    outtextxy((getmaxx div 2)-78,170+(vy div 2)-26,'Hrat');
+    outtextxy((getmaxx div 2)-163,170+(vy div 2)+vy-26,'Rebricek');
+    outtextxy((getmaxx div 2)-163,170+(vy div 2)+(2*vy)-26,'Napoveda');
+    outtextxy((getmaxx div 2)-118,170+(vy div 2)+(3*vy)-26,'Koniec');
     setcolor(green);
-    outtextxy((getmaxx div 2)-100,(170+(vy div 2))-29,'Hrat');
-    outtextxy((getmaxx div 2)-210,(170+(vy div 2)+vy)-29,'Rebricek');
-    outtextxy((getmaxx div 2)-210,(170+(vy div 2)+(2*vy))-29,'Napoveda');
-    outtextxy((getmaxx div 2)-155,(170+(vy div 2)+(3*vy))-29,'Koniec');
-    case sipky(getmaxx div 2,205,100,7,((getmaxy-250) div 4),4,blue) of
+    outtextxy((getmaxx div 2)-75,(170+(vy div 2))-29,'Hrat');
+    outtextxy((getmaxx div 2)-160,(170+(vy div 2)+vy)-29,'Rebricek');
+    outtextxy((getmaxx div 2)-160,(170+(vy div 2)+(2*vy))-29,'Napoveda');
+    outtextxy((getmaxx div 2)-115,(170+(vy div 2)+(3*vy))-29,'Koniec');
+    case sipky(getmaxx div 2,182,100,7,((getmaxy-250) div 4),4,green) of
     1:begin
            menu(5);
            esc:=0;
            stavhry:=0;
            vy:=((getmaxy-250) div 5);
-           settextstyle(0,0,7);setcolor(darkgray);
-           outtextxy((getmaxx div 2)-178,170+(vy div 2)-25,'Level 1');
-           outtextxy((getmaxx div 2)-178,170+(vy div 2)+vy-25,'Level 2');
-           outtextxy((getmaxx div 2)-178,170+(vy div 2)+(2*vy)-25,'Level 3');
-           outtextxy((getmaxx div 2)-178,170+(vy div 2)+(3*vy)-25,'Level 4');
-           outtextxy((getmaxx div 2)-103,170+(vy div 2)+(4*vy)-25,'Spat');
+           settextstyle(0,0,5);setcolor(darkgray);
+           outtextxy((getmaxx div 2)-143,170+(vy div 2)-26,'Level 1');
+           outtextxy((getmaxx div 2)-143,170+(vy div 2)+vy-26,'Level 2');
+           outtextxy((getmaxx div 2)-143,170+(vy div 2)+(2*vy)-26,'Level 3');
+           outtextxy((getmaxx div 2)-143,170+(vy div 2)+(3*vy)-26,'Level 4');
+           outtextxy((getmaxx div 2)-83,170+(vy div 2)+(4*vy)-26,'Spat');
            setcolor(green);
-           outtextxy((getmaxx div 2)-175,(170+(vy div 2))-29,'Level 1');
-           outtextxy((getmaxx div 2)-175,(170+(vy div 2)+vy)-29,'Level 2');
-           outtextxy((getmaxx div 2)-175,(170+(vy div 2)+(2*vy))-29,'Level 3');
-           outtextxy((getmaxx div 2)-175,(170+(vy div 2)+(3*vy))-29,'Level 4');
-           outtextxy((getmaxx div 2)-100,(170+(vy div 2)+(4*vy))-29,'Spat');
-           case sipky(getmaxx div 2,202,100,7,((getmaxy-250) div 5),5,blue) of
+           outtextxy((getmaxx div 2)-140,(170+(vy div 2))-29,'Level 1');
+           outtextxy((getmaxx div 2)-140,(170+(vy div 2)+vy)-29,'Level 2');
+           outtextxy((getmaxx div 2)-140,(170+(vy div 2)+(2*vy))-29,'Level 3');
+           outtextxy((getmaxx div 2)-140,(170+(vy div 2)+(3*vy))-29,'Level 4');
+           outtextxy((getmaxx div 2)-80,(170+(vy div 2)+(4*vy))-29,'Spat');
+           case sipky(getmaxx div 2,183,100,7,((getmaxy-250) div 5),5,green) of
            1:begin
                   pole();t:=0;
                   generovanie(1);
@@ -545,19 +693,23 @@ begin
 
       end;
     2:begin
+           rebricek();
+           repeat
+             if keypressed then ch:=readkey;
+           until ch=#27;
       end;
     3:begin
       end;
     4:begin
            menu(2);
            vy:=((getmaxy-250) div 2);
-           settextstyle(0,0,7);setcolor(darkgray);
+           settextstyle(0,0,5);setcolor(darkgray);
            outtextxy((getmaxx div 2)-103,170+(vy div 2)-25,'Spat');
            outtextxy((getmaxx div 2)-153,170+(vy div 2)+vy-25,'Koniec');
            setcolor(green);
            outtextxy((getmaxx div 2)-100,(170+(vy div 2))-29,'Spat');
            outtextxy((getmaxx div 2)-150,(170+(vy div 2)+vy)-29,'Koniec');
-           case sipky(getmaxx div 2,202,100,7,((getmaxy-250) div 2),2,blue) of
+           case sipky(getmaxx div 2,202,100,7,((getmaxy-250) div 2),2,green) of
            1:koniec:=0;
            2:koniec:=1;
            end;
@@ -569,13 +721,15 @@ end;
 
 begin
   randomize;
+  assign(subor,suborc);
   gd:=detect;
   initgraph(gd,gm,'C:\lazarus');
   //pole();
   //predpis();
   //vykreslenie(hraci[1].x,hraci[1].y);
+  login(20);
   hra();
 
-
+  close(subor);
   closegraph();
 end.
