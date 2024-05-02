@@ -19,7 +19,7 @@ var
   hraci: array [1..2] of Thrac;
   player:array [1..60] of Tscore;
   subor:file of Tscore;
-function StringToReal(s:string):real;
+function StringToReal(s:string):real;  //premena string->real
   var
     code:integer;
     value:real;
@@ -28,39 +28,45 @@ function StringToReal(s:string):real;
     if code=0 then
       StringToReal:=value
     else
-      StringToReal:= 0.0; // Return 0.0 if conversion fails
+      StringToReal:= 0.0; // ak zlyha da 0.0
   end;
 
-procedure tabulka();
-var i,j:integer;
+procedure tabulka();  //triedenie pola
+var i,j,l:integer;
 begin
- for i:=1 to 60 do
+ reset(subor);
+ l:=0;
+ for i:=1 to filesize(subor) do if length(player[i].menohraca)>0 then l:=l+1;
+ for i:=1 to l do
   begin
-   for j:=1 to 60-i do
+   for j:=1 to l-i do
     begin
       if player[j].scorehraca < player[j+1].scorehraca  then
       begin
        hrac:=player[j];
        player[j]:=player[j+1];
        player[j+1]:=hrac;
-      end
+      end;
     end;
   end;
+ close(subor);
 end;
 
-procedure prepis_do_subor();
+procedure prepis_do_subor();   //prepis pola do suboru
 var x:integer;
 begin
-  x:=0;
+  x:=1;
   rewrite(subor);
-  repeat
-    x:=x+1;
-    write(subor,player[x]);
-  until x = 60;
+  while length(player[x].menohraca)>0 do
+  begin
+     //x:=x+1;
+     write(subor,player[x]);
+     x:=x+1;
+  end;
   close(subor);
 end;
 
-procedure prepis_do_pola();
+procedure prepis_do_pola();   //typesuboru do pola
 var i:integer;
 begin
   reset(subor);
@@ -154,9 +160,9 @@ end;
 
 function fx(input1:string; c:integer):integer;   //vypocet funkcnej hodnoty
 var
-  i,j,poc,poc1,kod,posz:integer;
+  i,poc,poc1,posz:integer;
   x,res,cislo:real;
-  s1,s2,znamienko:string;
+  s1,znamienko:string;
 begin
   x:=c/k;
   if (pos('x',lowercase(input1))<1)  then fx:=hraci[1].y  //konstanty napr. y=2
@@ -545,26 +551,44 @@ begin
   outtextxy((getmaxx div 2)-305,55,'Graphwar');
   setcolor(green);
   outtextxy((getmaxx div 2)-300,50,'Graphwar');
-  settextstyle(0,0,1);setcolor(white);
   gy:=0;
   gx:=0;
   box(getmaxx div 2,270+((getmaxy-450) div 2),getmaxx-200,getmaxy-210,20,lightgray,darkgray,white);
   settextstyle(0,0,2);setcolor(black);
   for i:=1 to filesize(subor) do begin
-     read(subor,hrac);
      str(i,ii);
      str(player[i].scorehraca,score);
-     outtextxy(140+(gx*100),200+(gy*20),ii);
-     outtextxy(200+(gx*100),200+(gy*20),player[i].menohraca);
-     outtextxy(600+(gx*100),200+(gy*20),score);
-     gy:=gy+1;
+     outtextxy(140+(gx*400),200+(gy*20),ii);
+     outtextxy(200+(gx*400),200+(gy*20),player[i].menohraca);
+     outtextxy(600+(gx*400),200+(gy*20),score);
+     if 200+((gy+1)*20)>getmaxy-120 then begin
+       gy:=0;
+       gx:=gx+1;
+     end
+     else gy:=gy+1;
   end;
   close(subor);
+end;
+
+procedure najdi(body:integer);  //najde komu ma pripisat body po vyhre
+var i:integer;
+begin
+  reset(subor);
+  i:=0;
+  repeat
+     i:=i+1;
+     read(subor,hrac);
+  until hrac.menohraca=meno;
+  player[i].scorehraca:=player[i].scorehraca+body;
+  close(subor);
+  //prepis_do_subor();
+  //prepis_do_pola();
 end;
 
 procedure hra();     //cela hra
 var
   vy,koniec,t:integer;
+  napoveda1:string;
 begin
   prepis_do_pola();
   koniec:=0;
@@ -582,7 +606,7 @@ begin
     outtextxy((getmaxx div 2)-160,(170+(vy div 2)+(2*vy))-29,'Napoveda');
     outtextxy((getmaxx div 2)-115,(170+(vy div 2)+(3*vy))-29,'Koniec');
     case sipky(getmaxx div 2,182,100,7,((getmaxy-250) div 4),4,green) of
-    1:begin
+    1:begin           //hra
            menu(5);
            esc:=0;
            stavhry:=0;
@@ -600,7 +624,7 @@ begin
            outtextxy((getmaxx div 2)-140,(170+(vy div 2)+(3*vy))-29,'Level 4');
            outtextxy((getmaxx div 2)-80,(170+(vy div 2)+(4*vy))-29,'Spat');
            case sipky(getmaxx div 2,183,100,7,((getmaxy-250) div 5),5,green) of
-           1:begin
+           1:begin        //level 1
                   pole();t:=0;
                   generovanie(1);
                   repeat
@@ -621,9 +645,12 @@ begin
                        end;
                     end;
                   until (stavhry=1) or (esc=1);
-                  if stavhry=1 then
+                  if stavhry=1 then begin
+                      najdi(100);
+                      tabulka();
+                  end;
              end;
-           2:begin
+           2:begin      //level 2
                   pole();t:=0;
                   generovanie(2);
                   repeat
@@ -644,8 +671,12 @@ begin
                        end;
                     end;
                   until (stavhry=1) or (esc=1);
+                  if stavhry=1 then begin
+                      najdi(200);
+                      tabulka();
+                  end;
              end;
-           3:begin
+           3:begin        //level 3
                   pole();t:=0;
                   generovanie(3);
                   repeat
@@ -666,8 +697,12 @@ begin
                        end;
                     end;
                   until (stavhry=1) or (esc=1);
+                  if stavhry=1 then begin
+                      najdi(300);
+                      tabulka();
+                  end;
              end;
-           4:begin
+           4:begin         //level 4
                   pole();t:=0;
                   generovanie(4);
                   repeat
@@ -688,28 +723,54 @@ begin
                        end;
                     end;
                   until (stavhry=1) or (esc=1);
+                  if stavhry=1 then begin
+                      najdi(400);
+                      tabulka();
+                  end;
              end;
-           5:;
+           5:; //spat
            end;
 
       end;
-    2:begin
+    2:begin           //rebricek
            rebricek();
            repeat
              if keypressed then ch:=readkey;
            until ch=#27;
       end;
-    3:begin
+    3:begin            //napoveda
+           box(getmaxx div 2,getmaxy div 2,getmaxx,getmaxy,20,lightgray,white,darkgray);
+
+           //nadpis
+           settextstyle(0,0,10);
+           setcolor(darkgray);
+           outtextxy((getmaxx div 2)-305,55,'Graphwar');
+           setcolor(green);
+           outtextxy((getmaxx div 2)-300,50,'Graphwar');
+           box(getmaxx div 2,270+((getmaxy-450) div 2),getmaxx-200,getmaxy-210,20,lightgray,darkgray,white);
+
+
+           napoveda1:='Graphwar je delostrelecka hra, v ktorej musite zasiahnut svojich nepriatelov pomocou matematickych funkcii. Trajektoria vasej strely je urcena funkciou, ktoru ste napisali, a vasim cielom je vyhnut sa prekazkam a zasiahnur svojich nepriatelov. Hra sa odohrava v kartezianskej rovine.';
+           outtext();
+           repeat
+             if keypressed then ch:=readkey;
+           until ch=#27;
       end;
-    4:begin
+    4:begin          //koniec
            menu(2);
+           for i:=1 to 60 do begin
+                  writeln(i,'.  ','"',player[i].menohraca,'"  ',player[i].scorehraca);
+           end;
+
+
+
            vy:=((getmaxy-250) div 2);
            settextstyle(0,0,5);setcolor(darkgray);
-           outtextxy((getmaxx div 2)-103,170+(vy div 2)-25,'Spat');
-           outtextxy((getmaxx div 2)-153,170+(vy div 2)+vy-25,'Koniec');
+           outtextxy((getmaxx div 2)-93,170+(vy div 2)-25,'Spat');
+           outtextxy((getmaxx div 2)-133,170+(vy div 2)+vy-25,'Koniec');
            setcolor(green);
-           outtextxy((getmaxx div 2)-100,(170+(vy div 2))-29,'Spat');
-           outtextxy((getmaxx div 2)-150,(170+(vy div 2)+vy)-29,'Koniec');
+           outtextxy((getmaxx div 2)-90,(170+(vy div 2))-29,'Spat');
+           outtextxy((getmaxx div 2)-130,(170+(vy div 2)+vy)-29,'Koniec');
            case sipky(getmaxx div 2,202,100,7,((getmaxy-250) div 2),2,green) of
            1:koniec:=0;
            2:koniec:=1;
@@ -725,12 +786,8 @@ begin
   assign(subor,suborc);
   gd:=detect;
   initgraph(gd,gm,'C:\lazarus');
-  //pole();
-  //predpis();
-  //vykreslenie(hraci[1].x,hraci[1].y);
   login(20);
   hra();
-
-  close(subor);
+  prepis_do_subor();
   closegraph();
 end.
