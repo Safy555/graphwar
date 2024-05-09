@@ -9,133 +9,133 @@
         <Filename Value="graphwar.pas"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="729"/>
-        <CursorPos X="294" Y="753"/>
-        <FoldState Value=" T3L0A6 pjTkA0w2 pkAlV0e3]90l50U1("/>
-        <UsageCount Value="72"/>
+        <TopLine Value="967"/>
+        <CursorPos X="5" Y="1006"/>
+        <FoldState Value=" T3L0A6 pjTkA042 pl1lB0w]9kAlV0q3]90lH0U1 T1p40rH"/>
+        <UsageCount Value="85"/>
         <Loaded Value="True"/>
       </Unit0>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="51" Column="21" TopLine="10"/>
+        <Caret Line="375" Column="33" TopLine="274"/>
       </Position1>
       <Position2>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="551" Column="36" TopLine="357"/>
+        <Caret Line="305" Column="30" TopLine="98"/>
       </Position2>
       <Position3>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="553" Column="49" TopLine="252"/>
+        <Caret Line="247" Column="19" TopLine="166"/>
       </Position3>
       <Position4>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="551" Column="15" TopLine="252"/>
+        <Caret Line="307" Column="25" TopLine="285"/>
       </Position4>
       <Position5>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="556" Column="49" TopLine="215"/>
+        <Caret Line="353" Column="7" TopLine="328"/>
       </Position5>
       <Position6>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="554" Column="9" TopLine="534"/>
+        <Caret Line="341" Column="22" TopLine="321"/>
       </Position6>
       <Position7>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="537" Column="15" TopLine="534"/>
+        <Caret Line="169" Column="6" TopLine="116"/>
       </Position7>
       <Position8>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="540" Column="13" TopLine="11"/>
+        <Caret Line="175" Column="7" TopLine="78"/>
       </Position8>
       <Position9>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="734" Column="39" TopLine="709"/>
+        <Caret Line="342" Column="28" TopLine="322"/>
       </Position9>
       <Position10>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="756" Column="14" TopLine="717"/>
+        <Caret Line="350" Column="22" TopLine="330"/>
       </Position10>
       <Position11>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="67" Column="35" TopLine="13"/>
+        <Caret Line="381" Column="7" TopLine="361"/>
       </Position11>
       <Position12>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="215" Column="29" TopLine="155"/>
+        <Caret Line="386" Column="26" TopLine="350"/>
       </Position12>
       <Position13>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="214" Column="29" TopLine="155"/>
+        <Caret Line="377" Column="12" TopLine="347"/>
       </Position13>
       <Position14>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="215" Column="29" TopLine="155"/>
+        <Caret Line="385" Column="10" TopLine="363"/>
       </Position14>
       <Position15>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="159" Column="6" TopLine="110"/>
+        <Caret Line="378" Column="31" TopLine="358"/>
       </Position15>
       <Position16>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="157" Column="5" TopLine="110"/>
+        <Caret Line="379" Column="28" TopLine="355"/>
       </Position16>
       <Position17>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="66" Column="16" TopLine="16"/>
+        <Caret Line="333" Column="23" TopLine="313"/>
       </Position17>
       <Position18>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="585" Column="16" TopLine="464"/>
+        <Caret Line="244" Column="18" TopLine="68"/>
       </Position18>
       <Position19>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="68"/>
+        <Caret Line="395" Column="26" TopLine="369"/>
       </Position19>
       <Position20>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="760" Column="5" TopLine="720"/>
+        <Caret Line="244" Column="16" TopLine="16"/>
       </Position20>
       <Position21>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="560" Column="25" TopLine="465"/>
+        <Caret Line="400" Column="25" TopLine="358"/>
       </Position21>
       <Position22>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="536" Column="20" TopLine="18"/>
+        <Caret Line="393" Column="19" TopLine="367"/>
       </Position22>
       <Position23>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="59" Column="17" TopLine="19"/>
+        <Caret Line="309" Column="26" TopLine="297"/>
       </Position23>
       <Position24>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="531" Column="16" TopLine="499"/>
+        <Caret Line="1041" Column="32" TopLine="716"/>
       </Position24>
       <Position25>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="59" Column="17" TopLine="14"/>
+        <Caret Line="595" Column="79" TopLine="570"/>
       </Position25>
       <Position26>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="531" Column="16" TopLine="499"/>
+        <Caret Line="566" Column="164" TopLine="441"/>
       </Position26>
       <Position27>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="749" Column="109" TopLine="731"/>
+        <Caret Line="559" Column="284" TopLine="441"/>
       </Position27>
       <Position28>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="163" Column="14" TopLine="116"/>
+        <Caret Line="997" Column="31" TopLine="811"/>
       </Position28>
       <Position29>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="165" Column="6" TopLine="116"/>
+        <Caret Line="973" Column="26" TopLine="941"/>
       </Position29>
       <Position30>
         <Filename Value="graphwar.pas"/>
-        <Caret Line="221" Column="29" TopLine="201"/>
+        <Caret Line="975" Column="26" TopLine="941"/>
       </Position30>
     </JumpHistory>
   </ProjectSession>

@@ -12,8 +12,8 @@ type Thrac=record
   end;
 var
   gd,gm:smallint;
-  i,j,stavhry,esc:integer;
-  input,input_old,meno:string;
+  i,j,stavhry,esc,poc1,poc2,t,kod:integer;
+  input,input_old,meno,s,s1,ops2,ops1:string;
   ch:char;
   hrac:Tscore;
   hraci: array [1..2] of Thrac;
@@ -95,7 +95,7 @@ begin
 
 end;
 
-procedure panacik(panacikx,panaciky:integer;strana:string);  //vypis hracov
+procedure panacik(panacikx,panaciky:integer;strana:string);   //vypis hracov
 begin
    setfillstyle(1,red);setcolor(red);
    FillEllipse(panacikx,panaciky,hracr,hracr);
@@ -158,6 +158,189 @@ begin
 
 end;
 
+function GetPrecedence(ch: Char): Integer;   //prednost operatorov
+begin
+  if (ch='+') or (ch='-') then GetPrecedence:=1
+  else if (ch='*') or (ch='/') then GetPrecedence:=2;
+end;
+
+function Infixpostfix1(infix:string):string;   //infix->postfix
+var output,stack1,s:string;
+  i,c:integer;
+  x:real;
+begin
+  output:='';
+  stack1:='';
+  poc1:=0;
+  c:=1;
+  x:=c/k;
+  str(x:0:2,s);
+  for i:=1 to length(infix) do begin
+    if lowercase(infix[i])='x' then begin
+       delete(infix,i,1);
+       insert(s,infix,i);
+    end;
+  end;
+  for i:=1 to length(infix) do begin
+     if ((infix[i]>='0') and (infix[i]<='9')) or (infix[i]='.') or (lowercase(infix[i])='x')  then begin
+       if  ((infix[i+1]>='0') and (infix[i+1]<='9')) or (infix[i+1]='.') then begin
+         output:=output+infix[i];
+       end
+       else  begin
+         output:=output+infix[i]+' ';
+         poc1:=poc1+1;
+       end;
+     end
+     else if infix[i]='(' then stack1:=stack1+'('
+     else if (infix[i]='+') or (infix[i]='-') or (infix[i]='*') or (infix[i]='/') then
+     begin
+       if  (length(stack1)=0) or (stack1[length(stack1)]='(') or (GetPrecedence(stack1[Length(stack1)]) < GetPrecedence(infix[i])) then stack1:=stack1+infix[i]
+       else
+       begin
+          repeat
+             output:=output+stack1[length(stack1)]+' ';
+             delete(stack1,length(stack1),1);
+          until (length(stack1)=0) or (stack1[length(stack1)]='(') or (GetPrecedence(stack1[Length(stack1)]) < GetPrecedence(infix[i]));
+          stack1:=stack1+infix[i];
+       end;
+     end
+     else if infix[i] = ')' then
+     begin
+        while (Length(stack1) > 0) and (stack1[Length(stack1)] <> '(') do
+        begin
+             output := output + stack1[Length(stack1)]+' ';
+             Delete(stack1, Length(stack1), 1);
+             end;
+        Delete(stack1, Length(stack1), 1); // Remove the '(' from the stack
+     end;
+  end;
+
+  while Length(stack1) > 0 do
+  begin
+    output := output + stack1[Length(stack1)]+' ';
+    Delete(stack1,Length(stack1),1);
+  end;
+
+
+  Infixpostfix1:=output;
+  s:=output;
+  poc2:=0;
+
+  repeat
+     poc2:=poc2+1;
+     delete(s,pos(' ',s),1);
+  until pos(' ',s)=0;
+
+end;
+
+function Evaluate(infix:string; c:integer):integer;   //peklo
+var
+  s2,op1,op2,postfix,output,stack1,xs,s:string;
+  pom:char;
+  i,a,e,j:integer;
+  o1,o2,res,x:real;
+  operands:array ['a'..'z'] of string;
+  operand:array ['a'..'z'] of real;
+  stack:array [0..30] of real;
+begin
+  output:='';
+  stack1:='';
+  poc1:=0;
+  x:=c/k;
+  str(x:0:2,xs);  //overene napr. '-17.45'
+
+  a:=97;
+  for i:=1 to length(infix) do begin
+     if ((infix[i]>='0') and (infix[i]<='9')) or (infix[i]='.') or (lowercase(infix[i])='x')  then begin
+       if  ((infix[i+1]>='0') and (infix[i+1]<='9')) or (infix[i+1]='.') then begin
+         operands[chr(a)]:=operands[chr(a)]+infix[i];
+       end
+       else  begin
+         if infix[i]='x' then operands[chr(a)]:=xs
+         else operands[chr(a)]:=operands[chr(a)]+infix[i];
+         operand[chr(a)]:=StringToReal(operands[chr(a)]);
+         output:=output+chr(a)+' ';
+         poc1:=poc1+1;
+         a:=a+1;
+       end;
+     end
+     else if infix[i]='(' then stack1:=stack1+'('
+     else if (infix[i]='+') or (infix[i]='-') or (infix[i]='*') or (infix[i]='/') then
+     begin
+       if  (length(stack1)=0) or (stack1[length(stack1)]='(') or (GetPrecedence(stack1[Length(stack1)]) < GetPrecedence(infix[i])) then stack1:=stack1+infix[i]
+       else
+       begin
+          repeat
+             output:=output+stack1[length(stack1)]+' ';
+             delete(stack1,length(stack1),1);
+          until (length(stack1)=0) or (stack1[length(stack1)]='(') or (GetPrecedence(stack1[Length(stack1)]) < GetPrecedence(infix[i]));
+          stack1:=stack1+infix[i];
+       end;
+     end
+     else if infix[i] = ')' then
+     begin
+        while (Length(stack1) > 0) and (stack1[Length(stack1)] <> '(') do
+        begin
+             output := output + stack1[Length(stack1)]+' ';
+             Delete(stack1, Length(stack1), 1);
+             end;
+        Delete(stack1, Length(stack1), 1); // da prec '('
+     end;
+  end;
+
+  while Length(stack1) > 0 do
+  begin
+    output := output + stack1[Length(stack1)]+' ';
+    Delete(stack1,Length(stack1),1);
+  end;
+
+
+  postfix:=output;
+  s:=output;
+  poc2:=0;
+
+  repeat
+     poc2:=poc2+1;
+     delete(s,pos(' ',s),1);
+  until pos(' ',s)=0;
+
+  //funguje potialto
+  e:=0;
+  for i:=0 to 30 do begin
+   stack[i]:=0;
+  end;
+
+  if pos('x',infix)=0  then Evaluate:=hraci[1].y
+  else begin
+       for i:=1 to poc2 do begin
+       pom:=postfix[1];
+       delete(postfix,1,2);
+       if (pom='+') or (pom='-') or (pom='*') or (pom='/') then begin
+         a:=0;
+         if e-2=-1 then o1:=0
+         else o1:=stack[e-2];stack[e-2]:=0;
+         o2:=stack[e-1];stack[e-1]:=0;
+         if e-2=-1 then e:=e-1
+         else e:=e-2;
+
+         if pom='+' then res:=o1+o2
+         else if pom='-' then res:=o1-o2
+         else if pom='*' then res:=o1*o2
+         else if pom='/' then res:=o1 / o2;
+
+         stack[e]:=res;
+         e:=e+1;
+       end
+       else begin
+         stack[e]:=operand[pom];
+         e:=e+1;
+       end;
+    end;
+    evaluate:=round(-stack[0]*k+((getmaxy-100) div 2));
+
+  end;
+end;
+
 function fx(input1:string; c:integer):integer;   //vypocet funkcnej hodnoty
 var
   i,poc,poc1,posz:integer;
@@ -218,27 +401,27 @@ begin
   end;
 end;
 
-procedure vykreslenie(hracx,hracy:integer; vykreslenie_farba:word; inpu:string);  //vykreslenie funckie
+procedure vykreslenie(hracx,hracy:integer; vykreslenie_farba:word; inpu:string);   //vykreslenie funckie
 var
   j,p,poc:integer;
 begin
    poc:=0;
    if stavhry=2 then stavhry:=0;
-   p:=hraci[1].y-fx(inpu,hracx-100-((getmaxx-200) div 2));
+   p:=hraci[1].y-evaluate(inpu,hracx-100-((getmaxx-200) div 2));
    j:=hracx-100-((getmaxx-200) div 2)-1;
    repeat
       poc:=poc+1;
       j:=j+1;
-      if (getpixel(j+(getmaxx div 2),fx(inpu,j)+p)=green) then begin
+      if (getpixel(j+(getmaxx div 2),evaluate(inpu,j)+p)=green) then begin
            if  vykreslenie_farba<>black then begin
                 setcolor(black);setfillstyle(1,black);
-                FillEllipse(j+(getmaxx div 2),fx(inpu,j)+p,20,20);
+                FillEllipse(j+(getmaxx div 2),evaluate(inpu,j)+p,20,20);
                 stavhry:=2;
            end
            else  if vykreslenie_farba=black then stavhry:=2;
 
       end
-      else if (getpixel(j+(getmaxx div 2),fx(inpu,j)+p)=red) and ((hracx+poc)-(hracx)>(hracr+5)) then begin
+      else if (getpixel(j+(getmaxx div 2),evaluate(inpu,j)+p)=red) and ((hracx+poc)-(hracx)>(hracr+5)) then begin
            stavhry:=1;
            setcolor(darkgray);settextstyle(0,0,10);
            outtextxy((getmaxx div 2)-337,55,'Vyhral si');
@@ -247,10 +430,10 @@ begin
            repeat until keypressed;
       end
       else begin
-         putpixel(j+(getmaxx div 2),fx(inpu,j)+p,vykreslenie_farba);
+         putpixel(j+(getmaxx div 2),evaluate(inpu,j)+p,vykreslenie_farba);
          //delay(1);
       end;
-   until (j=((getmaxx-200) div 2)) or ((fx(inpu,j)+p>getmaxy-200)) or ((fx(inpu,j)+p<100)) or (stavhry<>0);
+   until (j=((getmaxx-200) div 2)) or ((evaluate(inpu,j)+p>getmaxy-200)) or ((evaluate(inpu,j)+p<100)) or (stavhry<>0);
 
 
 end;
@@ -361,7 +544,9 @@ begin
   moveto(78,((getmaxy-100)div 2)-4); outtext(cx);
 end;
 
-procedure predpis();  //input predpisu
+procedure predpis();   //input predpisu
+var
+  o:integer;
 begin
   input:='';
   setfillstyle(1,black);
@@ -371,7 +556,7 @@ begin
   repeat
       if keypressed then begin
         ch:=readkey;
-        if (((ord(ch)>=40)and(ord(ch)<=57))or (ord(ch)=88) or (ord(ch)=120) or (ord(ch)=88)) and ((ch<>#13)or(ch<>#8)or(ch<>#27)) then begin
+        if (((ord(ch)>=40)and(ord(ch)<=57)) or (ord(ch)=88) or (ord(ch)=120)) and ((ch<>#13)or(ch<>#8)or(ch<>#27)) then begin
            outtext(ch);
            input:=input+ch;
         end;
@@ -393,17 +578,27 @@ begin
       end;
   until ((ch=#13) and (length(input)>0)) or (esc=1);
   if (esc=0) then begin
-    if (input[1]<>'+') and (input[1]<>'-') then insert('+',input,1);
+    //if (input[1]<>'+') and (input[1]<>'-') then insert('+',input,1);
     if pos(',',input)<>0 then begin
       repeat
           input[pos(',',input)]:='.';
       until pos(',',input)=0;
     end;
+    if pos(' ',input)<>0 then begin
+      repeat
+          delete(input,pos(' ',input),1);
+      until pos(' ',input)=0;
+    end;
   end;
+  o:=length(input);
+  for i:=1 to o do begin
+     if (input[i]='-') and (lowercase(input[i+1])='x') then insert('1',input,i);
+  end;
+
   //SetTextStyle (0,0,1);setcolor(white);moveto(100,20);outtext(input);
 end;
 
-function sipky(sipky_x,sipky_y,sipky_sirka,sipky_vyska,skok,nn:integer; farba_sipky:word):integer; //sipky v menu
+function sipky(sipky_x,sipky_y,sipky_sirka,sipky_vyska,skok,nn:integer; farba_sipky:word):integer;   //sipky v menu
 var x,p:integer;
 begin
   x:=1;
@@ -440,7 +635,7 @@ begin
   sipky:=x;
 end;
 
-procedure menu(moznosti:integer);  //menu rozhranie
+procedure menu(moznosti:integer);   //menu rozhranie
 var
   space_cele,space_moznost,vys,sir,a:integer;
 begin
@@ -468,7 +663,7 @@ begin
 
 end;
 
-procedure login(dlzka:integer); //login hraca
+procedure login(dlzka:integer);   //login hraca
 var poc:integer;
     dlzkas:string;
 begin
@@ -570,7 +765,7 @@ begin
   close(subor);
 end;
 
-procedure najdi(body:integer);  //najde komu ma pripisat body po vyhre
+procedure najdi(body:integer);   //najde komu ma pripisat body po vyhre
 var i:integer;
 begin
   reset(subor);
@@ -585,9 +780,9 @@ begin
   //prepis_do_pola();
 end;
 
-procedure hra();     //cela hra
+procedure hra();    //cela hra
 var
-  vy,koniec,t:integer;
+  vy,koniec,t,m,n:integer;
   napoveda1:string;
 begin
   prepis_do_pola();
@@ -633,6 +828,7 @@ begin
                        predpis();
                        if esc<>1 then begin
                           vykreslenie(hraci[1].x,hraci[1].y,black,input_old);
+                          panacik(hraci[1].x,hraci[1].y,'p');
                           vykreslenie(hraci[1].x,hraci[1].y,magenta,input);
                           input_old:=input;
                        end;
@@ -659,6 +855,7 @@ begin
                        predpis();
                        if esc<>1 then begin
                           vykreslenie(hraci[1].x,hraci[1].y,black,input_old);
+                          panacik(hraci[1].x,hraci[1].y,'p');
                           vykreslenie(hraci[1].x,hraci[1].y,magenta,input);
                           input_old:=input;
                        end;
@@ -685,6 +882,7 @@ begin
                        predpis();
                        if esc<>1 then begin
                           vykreslenie(hraci[1].x,hraci[1].y,black,input_old);
+                          panacik(hraci[1].x,hraci[1].y,'p');
                           vykreslenie(hraci[1].x,hraci[1].y,magenta,input);
                           input_old:=input;
                        end;
@@ -711,6 +909,7 @@ begin
                        predpis();
                        if esc<>1 then begin
                           vykreslenie(hraci[1].x,hraci[1].y,black,input_old);
+                          panacik(hraci[1].x,hraci[1].y,'p');
                           vykreslenie(hraci[1].x,hraci[1].y,magenta,input);
                           input_old:=input;
                        end;
@@ -749,18 +948,30 @@ begin
            outtextxy((getmaxx div 2)-300,50,'Graphwar');
            box(getmaxx div 2,270+((getmaxy-450) div 2),getmaxx-200,getmaxy-210,20,lightgray,darkgray,white);
 
+           m:=0;
+           n:=0;
+           settextstyle(0,0,2);setcolor(black);
+           napoveda1:='Graphwar je delostrelecka hra, v ktorej musite zasiahnut svojich nepriatelov pomocou matematickych funkcii. Trajektoria vasej strely je urcena funkciou, ktoru ste napisali, a vasim cielom je vyhnut sa prekazkam a zasiahnut svojich nepriatelov. Hra sa odohrava v kartezianskej rovine. Funkcia ktoru napisete je vas vystrel, takze trajektoria vystrelu bude rovnaka ako trajektoria grafu funkcie. Je tu vsak problem. Funkciu musi zastrelit vas vojak, ale nie je zarucene, ze miesto, kde vas vojak stoji, patri do funkcie. Aby sa to vyriesilo, funkcia musi byt prelozena, kym pozicia vojaka nie je sucastou funkcie, to sa robi pridanim konstanty k funkcii. To znamena, ze ak je napisana funkcia y = f(x), skutocny graf bude v skutocnosti y = f(x)+c. Preklad funkcie ma niektore matuce dosledky. Po prve, akakolvek konstanta pridana k vasej funkcii je pre vysledok irelevantna. Napriklad funkcie y = 2*x + 3, y = 2*x - 8 a y = 2*x poskytuju presne rovnaky graf v hre. Dalsi matuci fakt suvisi s tym, ze limity osi x v hre su okolo -25 a +25(presne hodnoty su napisane na bokoch hracieho pola) a limity osi y su -15 a 15. To znamena, ze funkcie mozu byt velmi velke. Napriklad funkcia y = x^2 ma hodnotu 100, ked sa x rovna 10. To znamena, ze tato funkcia velmi rychlo narazi na strop hry. Ak je vas vojak umiestneny na pozicii, kde x je -15, tato funkcia bude velmi strma, s najvacsou pravdepodobnostou sa bude javit ako priamka nahor alebo nadol. Pamatajte, ze k tejto funkcii bude potrebne pridat obrovsku konstantu, takze vysledkom je nieco uplne ine, ako by ste mohli ocakavat. Tento problem sa da vyriesit vhodnym skalovanim funkcie, funkcia y = (x^2)/50 vytvori pekne vyzerajucu parabolu. Dalsia vec, ktora vas moze zmiast je, ze vasi vojaci budu vzdy stat na zapornych hodnotach x. Vas tim sa nachadza nalavo od osi y, takze sa to ocakava a znamena to, ze funkcie ako y = 1/x vas nebudu mat radi a na kladnu stranu hracieho pola sa nikdy nedostane. Povolene operatory su "+" "-" "*" "/".';
+           for i:=1 to length(napoveda1) do begin
+              if 130+n>getmaxx-150 then begin
+                 n:=0;
+                 m:=m+18;
+              end;
+              outtextxy(130+n,220+m,napoveda1[i]);
+              n:=n+15;
 
-           napoveda1:='Graphwar je delostrelecka hra, v ktorej musite zasiahnut svojich nepriatelov pomocou matematickych funkcii. Trajektoria vasej strely je urcena funkciou, ktoru ste napisali, a vasim cielom je vyhnut sa prekazkam a zasiahnur svojich nepriatelov. Hra sa odohrava v kartezianskej rovine.';
-           outtext();
+
+
+           end;
            repeat
              if keypressed then ch:=readkey;
            until ch=#27;
       end;
     4:begin          //koniec
            menu(2);
-           for i:=1 to 60 do begin
+           {for i:=1 to 60 do begin
                   writeln(i,'.  ','"',player[i].menohraca,'"  ',player[i].scorehraca);
-           end;
+           end;}
 
 
 
@@ -786,8 +997,11 @@ begin
   assign(subor,suborc);
   gd:=detect;
   initgraph(gd,gm,'C:\lazarus');
+
   login(20);
   hra();
   prepis_do_subor();
+
   closegraph();
+  //readln();
 end.
